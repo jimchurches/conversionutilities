@@ -13,6 +13,7 @@ from convert import (
     parse_money,
     parse_option_contract,
     parse_schwab_date,
+    reorder_same_day_dividend_tax_rows,
     reorder_same_day_option_rows,
     row_action,
     split_amount,
@@ -138,6 +139,33 @@ def test_reorder_same_day_option_rows():
     assert row_action(reordered[0]) == "Qualified Dividend"
     assert row_action(reordered[1]) == "Buy to Close"
     assert row_action(reordered[2]) == "Sell to Open"
+
+
+def test_reorder_same_day_dividend_tax_rows():
+    tax = pd.Series(
+        {
+            "Date": "05/26/2026",
+            "Action": "NRA Tax Adj",
+            "Symbol": "WMT",
+            "Description": "WALMART INC",
+            "Quantity": "",
+            "Amount": "($2.34)",
+        }
+    )
+    dividend = pd.Series(
+        {
+            "Date": "05/26/2026",
+            "Action": "Qualified Dividend",
+            "Symbol": "WMT",
+            "Description": "WALMART INC",
+            "Quantity": "",
+            "Amount": "$15.59",
+        }
+    )
+
+    reordered = reorder_same_day_dividend_tax_rows([tax, dividend])
+    assert row_action(reordered[0]) == "Qualified Dividend"
+    assert row_action(reordered[1]) == "NRA Tax Adj"
 
 
 def test_merge_assigned_buy(config):

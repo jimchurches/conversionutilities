@@ -39,6 +39,24 @@ OPTION_ACTION_ORDER = {
     "Sell to Close": 2,
     "Sell to Open": 3,
 }
+TAX_ACTIONS = {
+    "NRA Tax Adj",
+    "Foreign Tax Paid",
+    "Pr Yr NRA Tax",
+}
+DIVIDEND_ACTIONS = {
+    "Qualified Dividend",
+    "Cash Dividend",
+    "Special Dividend",
+    "Special Qual Div",
+    "Non-Qualified Div",
+    "Pr Yr Cash Div",
+}
+# Earlier in the CSV file -> later in Sharesight's newest-first ledger for the same day.
+DIVIDEND_TAX_CSV_ORDER = {
+    **{action: 0 for action in DIVIDEND_ACTIONS},
+    **{action: 1 for action in TAX_ACTIONS},
+}
 
 
 @dataclass
@@ -382,6 +400,33 @@ def reorder_same_day_option_rows(rows: list[pd.Series]) -> list[pd.Series]:
     return result
 
 
+def reorder_same_day_dividend_tax_rows(rows: list[pd.Series]) -> list[pd.Series]:
+    """Order dividend before tax in the CSV so Sharesight shows payment then withholding."""
+    result = list(rows)
+    by_date_symbol: dict[tuple[Any, str], list[int]] = {}
+
+    for idx, row in enumerate(result):
+        action = row_action(row)
+        if action not in DIVIDEND_TAX_CSV_ORDER:
+            continue
+        symbol = underlying_symbol(row_symbol(row))
+        key = (parse_schwab_date(row["Date"]).date(), symbol)
+        by_date_symbol.setdefault(key, []).append(idx)
+
+    for indices in by_date_symbol.values():
+        tax_indices = [i for i in indices if row_action(result[i]) in TAX_ACTIONS]
+        dividend_indices = [i for i in indices if row_action(result[i]) in DIVIDEND_ACTIONS]
+        if not tax_indices or not dividend_indices:
+            continue
+        slot_indices = sorted(indices)
+        paired_rows = [result[i] for i in indices]
+        paired_rows.sort(key=lambda row: DIVIDEND_TAX_CSV_ORDER[row_action(row)])
+        for slot, row in zip(slot_indices, paired_rows, strict=True):
+            result[slot] = row
+
+    return result
+
+
 def convert_row(row: pd.Series, config: dict[str, Any]) -> ConvertedRow | ExceptionRow:
     symbol = row_symbol(row)
     source_description = "" if pd.isna(row.get("Description")) else str(row["Description"]).strip()
@@ -424,6 +469,7 @@ def convert_file(
 
     source_rows = merge_assigned_buys([row for _, row in source_df.iterrows()], config)
     source_rows = reorder_same_day_option_rows(source_rows)
+    source_rows = reorder_same_day_dividend_tax_rows(source_rows)
 
     converted_rows: list[ConvertedRow] = []
     exception_rows: list[ExceptionRow] = []
