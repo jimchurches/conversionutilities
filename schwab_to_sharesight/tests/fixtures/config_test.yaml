@@ -1,0 +1,29 @@
+defaults:
+  unit_label: shares
+
+securities:
+  LULU:
+    sharesight_code: LULU.NASDAQ
+    unit_label: shares
+  AAPL:
+    sharesight_code: APPL.NASDAQ
+    unit_label: shares
+
+transaction_templates:
+  Sell: "SELL {quantity:g} x {sharesight_code} {unit_label}"
+  Buy: "BUY {quantity:g} x {sharesight_code} {unit_label}{assignment_note}"
+  Qualified Dividend: "Income: {sharesight_code} qualified dividend"
+  NRA Tax Adj: "Foreign Tax (United States NRA Withholding)"
+  Margin Interest: "Margin interest"
+  Sell to Open: "Options Premium: STO {quantity:g} x {option_contract}"
+  Buy to Close: "Options Premium: BTC {quantity:g} x {option_contract}"
+  Expired: "Options Expired: {quantity:g} x {option_contract_mapped} ( {position} )"
+
+output:
+  date_format: d/m/Y
+  include_currency_symbol: false
+  columns:
+    - Date
+    - Deposit amount
+    - Withdrawal amount
+    - Description

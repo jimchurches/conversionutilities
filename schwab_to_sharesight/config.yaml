@@ -1,0 +1,598 @@
+defaults:
+  unit_label: shares
+securities:
+  AAPL:
+    sharesight_code: APPL.NASDAQ
+    unit_label: shares
+  ABMD:
+    sharesight_code: ABMD.NASDAQ
+    unit_label: shares
+  ABNB:
+    sharesight_code: ABNB.NASDAQ
+    unit_label: shares
+  ACEV:
+    sharesight_code: ACEV.NASDAQ
+    unit_label: shares
+  ACN:
+    sharesight_code: ACN.NYSE
+    unit_label: shares
+  ADBE:
+    sharesight_code: ADBE.NASDAQ
+    unit_label: shares
+  AFRM:
+    sharesight_code: AFRM.NASDAQ
+    unit_label: shares
+  AMT:
+    sharesight_code: AMT.NYSE
+    unit_label: shares
+  AMY:
+    sharesight_code: AMY.NYSE
+    unit_label: shares
+  AMZN:
+    sharesight_code: AMZN.NASDAQ
+    unit_label: shares
+  ANET:
+    sharesight_code: ANET.NYSE
+    unit_label: shares
+  APPH:
+    sharesight_code: APPH.NASDAQ
+    unit_label: shares
+  APPN:
+    sharesight_code: APPN.NASDAQ
+    unit_label: shares
+  ARE:
+    sharesight_code: ARE.NYSE
+    unit_label: shares
+  ARKG:
+    sharesight_code: ARKG.NYSE
+    unit_label: units
+  ARKK:
+    sharesight_code: ARKK.NYSE
+    unit_label: units
+  ATVI:
+    sharesight_code: ATVI.NASDAQ
+    unit_label: shares
+  AXON:
+    sharesight_code: AXON.NASDAQ
+    unit_label: shares
+  AY:
+    sharesight_code: AY.NASDAQ
+    unit_label: shares
+  AYX:
+    sharesight_code: AYX.NYSE
+    unit_label: shares
+  BAM:
+    sharesight_code: BAM.NYSE
+    unit_label: shares
+  BAMR:
+    sharesight_code: BAMR.NYSE
+    unit_label: shares
+  BAP:
+    sharesight_code: BAP.NYSE
+    unit_label: shares
+  BBBY:
+    sharesight_code: BBBY.NASDAQ
+    unit_label: shares
+  BEP:
+    sharesight_code: BEP.NYSE
+    unit_label: shares
+  BEPC:
+    sharesight_code: BEPC.NYSE
+    unit_label: shares
+  BERK:
+    sharesight_code: BERK.NYSE
+    unit_label: shares
+  BFLY:
+    sharesight_code: BFLY.NYSE
+    unit_label: shares
+  BILI:
+    sharesight_code: BILI.NASDAQ
+    unit_label: shares
+  BL:
+    sharesight_code: BL.NASDAQ
+    unit_label: shares
+  BN:
+    sharesight_code: BN.NYSE
+    unit_label: shares
+  BOC:
+    sharesight_code: BOC.NYSE
+    unit_label: shares
+  BOMN:
+    sharesight_code: BOMN.NASDAQ
+    unit_label: shares
+  BR:
+    sharesight_code: BR.NYSE
+    unit_label: shares
+  BRKB:
+    sharesight_code: BRKB.NYSE
+    unit_label: shares
+  BYND:
+    sharesight_code: BYND.NASDAQ
+    unit_label: shares
+  CDNS:
+    sharesight_code: CDNS.NASDAQ
+    unit_label: shares
+  CELH:
+    sharesight_code: CELH.NASDAQ
+    unit_label: shares
+  CHW:
+    sharesight_code: CHW.NYSE
+    unit_label: shares
+  CHWY:
+    sharesight_code: CHWY.NYSE
+    unit_label: shares
+  CLOV:
+    sharesight_code: CLOV.NASDAQ
+    unit_label: shares
+  CMG:
+    sharesight_code: CMG.NYSE
+    unit_label: shares
+  CMPS:
+    sharesight_code: CMPS.NASDAQ
+    unit_label: shares
+  COIN:
+    sharesight_code: COIN.NASDAQ
+    unit_label: shares
+  CRM:
+    sharesight_code: CRM.NYSE
+    unit_label: shares
+  CRSP:
+    sharesight_code: CRSP.NASDAQ
+    unit_label: shares
+  CRWD:
+    sharesight_code: CRWD.NASDAQ
+    unit_label: shares
+  CURI:
+    sharesight_code: CURI.NASDAQ
+    unit_label: shares
+  CWH:
+    sharesight_code: CWH.NYSE
+    unit_label: shares
+  DCBO:
+    sharesight_code: DCBO.NASDAQ
+    unit_label: shares
+  DCON:
+    sharesight_code: DCON.NYSE
+    unit_label: shares
+  DDOG:
+    sharesight_code: DDOG.NASDAQ
+    unit_label: shares
+  DIS:
+    sharesight_code: DIS.NYSE
+    unit_label: shares
+  DMTK:
+    sharesight_code: DMTK.NASDAQ
+    unit_label: shares
+  DNMR:
+    sharesight_code: DNMR.NYSE
+    unit_label: shares
+  DOCN:
+    sharesight_code: DOCN.NYSE
+    unit_label: shares
+  DOCU:
+    sharesight_code: DOCU.NASDAQ
+    unit_label: shares
+  EBAY:
+    sharesight_code: EBAY.NASDAQ
+    unit_label: shares
+  ENPH:
+    sharesight_code: ENPH.NASDAQ
+    unit_label: shares
+  ETSY:
+    sharesight_code: ETSY.NASDAQ
+    unit_label: shares
+  FIGS:
+    sharesight_code: FIGS.NYSE
+    unit_label: shares
+  FIVE:
+    sharesight_code: FIVE.NASDAQ
+    unit_label: shares
+  FLGT:
+    sharesight_code: FLGT.NASDAQ
+    unit_label: shares
+  FROG:
+    sharesight_code: FROG.NASDAQ
+    unit_label: shares
+  FSLY:
+    sharesight_code: FSLY.NYSE
+    unit_label: shares
+  FUBO:
+    sharesight_code: FUBO.NYSE
+    unit_label: shares
+  FVRR:
+    sharesight_code: FVRR.NYSE
+    unit_label: shares
+  GMED:
+    sharesight_code: GMED.NYSE
+    unit_label: shares
+  GOOG:
+    sharesight_code: GOOG.NASDAQ
+    unit_label: shares
+  HUBS:
+    sharesight_code: HUBS.NYSE
+    unit_label: shares
+  IBKR:
+    sharesight_code: IBKR.NASDAQ
+    unit_label: shares
+  INTC:
+    sharesight_code: INTC.NASDAQ
+    unit_label: shares
+  IONS:
+    sharesight_code: IONS.NASDAQ
+    unit_label: shares
+  IPOB:
+    sharesight_code: IPOB.NYSE
+    unit_label: shares
+  IPOC:
+    sharesight_code: IPOC.NYSE
+    unit_label: shares
+  IPODU:
+    sharesight_code: IPODU.NYSE
+    unit_label: shares
+  IPOE:
+    sharesight_code: IPOE.NYSE
+    unit_label: shares
+  IPOFU:
+    sharesight_code: IPOFU.NYSE
+    unit_label: shares
+  IQ:
+    sharesight_code: IQ.NASDAQ
+    unit_label: shares
+  ISRG:
+    sharesight_code: ISRG.NASDAQ
+    unit_label: shares
+  JD:
+    sharesight_code: JD.NASDAQ
+    unit_label: shares
+  KNSL:
+    sharesight_code: KNSL.NYSE
+    unit_label: shares
+  LMDN:
+    sharesight_code: LMDN.NYSE
+    unit_label: shares
+  LMND:
+    sharesight_code: LMND.NYSE
+    unit_label: shares
+  LOB:
+    sharesight_code: LOB.NYSE
+    unit_label: shares
+  LPSD:
+    sharesight_code: LPSD.NYSE
+    unit_label: shares
+  LSCC:
+    sharesight_code: LSCC.NASDAQ
+    unit_label: shares
+  LSPD:
+    sharesight_code: LSPD.NASDAQ
+    unit_label: shares
+  LULU:
+    sharesight_code: LULU.NASDAQ
+    unit_label: shares
+  LVGO:
+    sharesight_code: LVGO.NASDAQ
+    unit_label: shares
+  LYV:
+    sharesight_code: LYV.NYSE
+    unit_label: shares
+  MA:
+    sharesight_code: MA.NYSE
+    unit_label: shares
+  MAA:
+    sharesight_code: MAA.NYSE
+    unit_label: shares
+  MAR:
+    sharesight_code: MAR.NASDAQ
+    unit_label: shares
+  MASI:
+    sharesight_code: MASI.NASDAQ
+    unit_label: shares
+  MCK:
+    sharesight_code: MCK.NYSE
+    unit_label: shares
+  MDB:
+    sharesight_code: MDB.NASDAQ
+    unit_label: shares
+  MELI:
+    sharesight_code: MELI.NASDAQ
+    unit_label: shares
+  META:
+    sharesight_code: META.NASDAQ
+    unit_label: shares
+  MNST:
+    sharesight_code: MNST.NASDAQ
+    unit_label: shares
+  MSFT:
+    sharesight_code: MSFT.NASDAQ
+    unit_label: shares
+  MSTF:
+    sharesight_code: MSTF.NASDAQ
+    unit_label: shares
+  MTCH:
+    sharesight_code: MTCH.NASDAQ
+    unit_label: shares
+  NEE:
+    sharesight_code: NEE.NYSE
+    unit_label: shares
+  NET:
+    sharesight_code: NET.NASDAQ
+    unit_label: shares
+  NFLX:
+    sharesight_code: NFLX.NASDAQ
+    unit_label: shares
+  NIO:
+    sharesight_code: NIO.NYSE
+    unit_label: shares
+  NNOX:
+    sharesight_code: NNOX.NASDAQ
+    unit_label: shares
+  NOW:
+    sharesight_code: NOW.NYSE
+    unit_label: shares
+  NVCR:
+    sharesight_code: NVCR.NASDAQ
+    unit_label: shares
+  NVDA:
+    sharesight_code: NVDA.NASDAQ
+    unit_label: shares
+  NVTA:
+    sharesight_code: NVTA.NYSE
+    unit_label: shares
+  OATLY:
+    sharesight_code: OATLY.NASDAQ
+    unit_label: shares
+  OKTA:
+    sharesight_code: OKTA.NASDAQ
+    unit_label: shares
+  OM:
+    sharesight_code: OM.NASDAQ
+    unit_label: shares
+  OPEN:
+    sharesight_code: OPEN.NASDAQ
+    unit_label: shares
+  OTLY:
+    sharesight_code: OTLY.NASDAQ
+    unit_label: shares
+  PANW:
+    sharesight_code: PANW.NASDAQ
+    unit_label: shares
+  PAYC:
+    sharesight_code: PAYC.NYSE
+    unit_label: shares
+  PINS:
+    sharesight_code: PINS.NYSE
+    unit_label: shares
+  PLD:
+    sharesight_code: PLD.NYSE
+    unit_label: shares
+  PLL:
+    sharesight_code: PLL.NASDAQ
+    unit_label: shares
+  PLNT:
+    sharesight_code: PLNT.NYSE
+    unit_label: shares
+  PTON:
+    sharesight_code: PTON.NASDAQ
+    unit_label: shares
+  PWR:
+    sharesight_code: PWR.NYSE
+    unit_label: shares
+  PYPL:
+    sharesight_code: PYPL.NASDAQ
+    unit_label: shares
+  QQQ:
+    sharesight_code: QQQ.NASDAQ
+    unit_label: units
+  RACE:
+    sharesight_code: RACE.NYSE
+    unit_label: shares
+  RBLX:
+    sharesight_code: RBLX.NYSE
+    unit_label: shares
+  RDFN:
+    sharesight_code: RDFN.NASDAQ
+    unit_label: shares
+  RGEN:
+    sharesight_code: RGEN.NASDAQ
+    unit_label: shares
+  RKT:
+    sharesight_code: RKT.NYSE
+    unit_label: shares
+  ROKU:
+    sharesight_code: ROKU.NASDAQ
+    unit_label: shares
+  SBUX:
+    sharesight_code: SBUX.NASDAQ
+    unit_label: shares
+  SDGR:
+    sharesight_code: SDGR.NASDAQ
+    unit_label: shares
+  SE:
+    sharesight_code: SE.NYSE
+    unit_label: shares
+  SFIX:
+    sharesight_code: SFIX.NASDAQ
+    unit_label: shares
+  SGDR:
+    sharesight_code: SGDR.NASDAQ
+    unit_label: shares
+  SGEN:
+    sharesight_code: SGEN.NASDAQ
+    unit_label: shares
+  SHOP:
+    sharesight_code: SHOP.NYSE
+    unit_label: shares
+  SKLZ:
+    sharesight_code: SKLZ.NASDAQ
+    unit_label: shares
+  SNOW:
+    sharesight_code: SNOW.NYSE
+    unit_label: shares
+  SNPS:
+    sharesight_code: SNPS.NASDAQ
+    unit_label: shares
+  SOFI:
+    sharesight_code: SOFI.NASDAQ
+    unit_label: shares
+  SPCE:
+    sharesight_code: SPCE.NYSE
+    unit_label: shares
+  SQ:
+    sharesight_code: SQ.NYSE
+    unit_label: shares
+  STMP:
+    sharesight_code: STMP.NASDAQ
+    unit_label: shares
+  STNE:
+    sharesight_code: STNE.NASDAQ
+    unit_label: shares
+  STRL:
+    sharesight_code: STRL.NASDAQ
+    unit_label: shares
+  SWAV:
+    sharesight_code: SWAV.NASDAQ
+    unit_label: shares
+  TASK:
+    sharesight_code: TASK.NASDAQ
+    unit_label: shares
+  TCEHY:
+    sharesight_code: TCEHY.OTC
+    unit_label: shares
+  TDOC:
+    sharesight_code: TDOC.NYSE
+    unit_label: shares
+  TEAM:
+    sharesight_code: TEAM.NASDAQ
+    unit_label: shares
+  TECHY:
+    sharesight_code: TECHY.OTC
+    unit_label: shares
+  TPCI:
+    sharesight_code: TPCI.NASDAQ
+    unit_label: shares
+  TREX:
+    sharesight_code: TREX.NYSE
+    unit_label: shares
+  TSLA:
+    sharesight_code: TSLA.NASDAQ
+    unit_label: shares
+  TTD:
+    sharesight_code: TTD.NASDAQ
+    unit_label: shares
+  TTWO:
+    sharesight_code: TTWO.NASDAQ
+    unit_label: shares
+  TWLO:
+    sharesight_code: TWLO.NYSE
+    unit_label: shares
+  TXG:
+    sharesight_code: TXG.NASDAQ
+    unit_label: shares
+  TXRH:
+    sharesight_code: TXRH.NASDAQ
+    unit_label: shares
+  U:
+    sharesight_code: U.NASDAQ
+    unit_label: shares
+  UBER:
+    sharesight_code: UBER.NYSE
+    unit_label: shares
+  UPST:
+    sharesight_code: UPST.NASDAQ
+    unit_label: shares
+  UPWK:
+    sharesight_code: UPWK.NASDAQ
+    unit_label: shares
+  V:
+    sharesight_code: V.NYSE
+    unit_label: shares
+  VEEV:
+    sharesight_code: VEEV.NYSE
+    unit_label: shares
+  VWDRY:
+    sharesight_code: VWDRY.OTC
+    unit_label: shares
+  W:
+    sharesight_code: W.NYSE
+    unit_label: shares
+  WD:
+    sharesight_code: WD.NYSE
+    unit_label: shares
+  WDAY:
+    sharesight_code: WDAY.NASDAQ
+    unit_label: shares
+  WIX:
+    sharesight_code: WIX.NASDAQ
+    unit_label: shares
+  WKHS:
+    sharesight_code: WKHS.NASDAQ
+    unit_label: shares
+  WMT:
+    sharesight_code: WMT.NYSE
+    unit_label: shares
+  WORK:
+    sharesight_code: WORK.NYSE
+    unit_label: shares
+  XYZ:
+    sharesight_code: XYZ.NYSE
+    unit_label: shares
+  YEXT:
+    sharesight_code: YEXT.NYSE
+    unit_label: shares
+  Z:
+    sharesight_code: Z.NASDAQ
+    unit_label: shares
+  ZEN:
+    sharesight_code: ZEN.NYSE
+    unit_label: shares
+  ZG:
+    sharesight_code: ZG.NASDAQ
+    unit_label: shares
+  ZM:
+    sharesight_code: ZM.NASDAQ
+    unit_label: shares
+  ZNGA:
+    sharesight_code: ZNGA.NASDAQ
+    unit_label: shares
+  ZOU:
+    sharesight_code: ZOU.NYSE
+    unit_label: shares
+  ZS:
+    sharesight_code: ZS.NASDAQ
+    unit_label: shares
+  ZUO:
+    sharesight_code: ZUO.NYSE
+    unit_label: shares
+transaction_templates:
+  Sell: SELL {quantity:g} x {sharesight_code} {unit_label}
+  Buy: BUY {quantity:g} x {sharesight_code} {unit_label}{assignment_note}
+  Qualified Dividend: 'Income: {sharesight_code} qualified dividend'
+  Cash Dividend: 'Income: {sharesight_code} cash dividend'
+  Special Dividend: 'Income: {sharesight_code} special dividend'
+  Special Qual Div: 'Income: {sharesight_code} special dividend'
+  Non-Qualified Div: 'Income: {sharesight_code} non-qualified dividend'
+  Pr Yr Cash Div: 'Income: {sharesight_code} cash dividend'
+  NRA Tax Adj: Foreign Tax (United States NRA Withholding)
+  Foreign Tax Paid: Foreign Tax (United States NRA Withholding)
+  Pr Yr NRA Tax: Foreign Tax (United States NRA Withholding)
+  Margin Interest: Margin interest
+  Credit Interest: 'Income: Interest payment'
+  ADR Mgmt Fee: ADR Management Fee ({sharesight_code})
+  Return Of Capital: 'Return of capital: {sharesight_code}'
+  Sell to Open: 'Options Premium: STO {quantity:g} x {option_contract}'
+  Buy to Close: 'Options Premium: BTC {quantity:g} x {option_contract}'
+  Sell to Close: 'Options Premium: STC {quantity:g} x {option_contract}'
+  Buy to Open: 'Options Premium: BTO {quantity:g} x {option_contract}'
+  Expired: 'Options Expired: {quantity:g} x {option_contract_mapped} ( {position} )'
+stock_splits:
+  NOW:
+    ratio: "1:5"
+  NFLX:
+    ratio: "1:10"
+output:
+  date_format: d/m/Y
+  include_currency_symbol: false
+  columns:
+  - Date
+  - Deposit amount
+  - Withdrawal amount
+  - Description

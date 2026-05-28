@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.DS_Store
+
+# Generated conversion output (may contain personal transaction data)
+output/*.csv
+!output/.gitkeep
+
+# Real Schwab exports — keep local only (filenames often include account identifiers)
+input/*.csv
+!input/sample_schwab.csv
+*_Transactions_*.csv
+
+# Local-only folder for working copies of real Schwab exports
+local/*
+!local/.gitkeep
