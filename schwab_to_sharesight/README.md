@@ -11,7 +11,9 @@ Convert Charles Schwab transaction CSV exports into Sharesight bulk cash import 
 - Looks up exchange suffixes from `config.yaml` (does not guess exchanges)
 - Writes an exceptions report for rows that cannot be converted confidently
 
-## Install
+## Setup (once)
+
+From the project directory:
 
 ```bash
 cd schwab_to_sharesight
@@ -20,13 +22,55 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Run
+On macOS/Linux, activate the virtual environment with `source .venv/bin/activate` each time you open a new terminal. Your prompt should show `(.venv)`.
+
+## How to use
+
+**1. Activate the virtual environment** (skip if already active):
 
 ```bash
+cd schwab_to_sharesight
+source .venv/bin/activate
+```
+
+**2. Run the converter** on your Schwab export:
+
+```bash
+python convert.py "/path/to/your/schwab_export.csv" output/sharesight_import.csv --config config.yaml
+```
+
+Example using a file from Downloads:
+
+```bash
+python convert.py ~/Downloads/schwab_export.csv output/sharesight_import.csv --config config.yaml
+```
+
+**3. Check the result**
+
+- If conversion succeeds, upload `output/sharesight_import.csv` to Sharesight.
+- If there are problems, the tool prints a summary and writes `output/exceptions.csv`. Fix missing tickers in `config.yaml` (or other issues listed), then run again. The import file is **not** written until all rows convert successfully.
+
+**Optional:** copy your Schwab export into `local/` before converting (that folder is gitignored):
+
+```bash
+cp ~/Downloads/schwab_export.csv local/
+python convert.py local/schwab_export.csv output/sharesight_import.csv --config config.yaml
+```
+
+**4. Run tests** (optional):
+
+```bash
+pytest
+```
+
+## Run (quick reference)
+
+```bash
+source .venv/bin/activate
 python convert.py input/schwab.csv output/sharesight_import.csv --config config.yaml
 ```
 
-Exceptions are written to `output/exceptions.csv` by default. If any exceptions exist, the import file is **not** written until they are resolved.
+Exceptions are written to `output/exceptions.csv` by default.
 
 ## Output format
 
@@ -95,22 +139,4 @@ Committed fixtures use generic filenames and contain no account identifiers:
 - `tests/fixtures/schwab_trust_catchup_sample.csv` — anonymized Schwab export (125 rows, Sep 2025–May 2026)
 - `tests/fixtures/sharesight_trust_catchup_expected.csv` — matching Sharesight import
 
-Real Schwab export filenames (often containing account numbers) are gitignored. Keep working copies in `local/`:
-
-```bash
-python convert.py local/my_export.csv output/import.csv
-pytest
-```
-
-## Tests
-
-```bash
-pytest
-```
-
-## Example
-
-```bash
-python convert.py input/sample_schwab.csv output/sharesight_import.csv
-pytest
-```
+Real Schwab export filenames (often containing account numbers) are gitignored. Prefer keeping working copies in `local/` (see **How to use** above).
