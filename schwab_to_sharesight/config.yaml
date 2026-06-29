@@ -1,5 +1,10 @@
 defaults:
   unit_label: shares
+smsf:
+  member_name: YOUR SMSF MEMBER NAME
+  destination_account: YOUR DESTINATION ACCOUNT NAME
+  contribution_type: Voluntary Contribution
+  # aud_exchange_rate: 1.52  # optional; adds (AU$...) to the contribution description
 securities:
   AAPL:
     sharesight_code: APPL.NASDAQ
@@ -565,6 +570,9 @@ securities:
 transaction_templates:
   Sell: SELL {quantity:g} x {sharesight_code} {unit_label}
   Buy: BUY {quantity:g} x {sharesight_code} {unit_label}{assignment_note}
+  Journaled Shares Deposit: 'Non-Concessional Contribution ({member_name}) (In-Specie Transfer {quantity:g} x {sharesight_code}){aud_suffix}'
+  Journaled Shares Withdrawal: BUY {quantity:g} {sharesight_code} {unit_label} (In-Specie Transfer)
+  Journaled Shares Out: 'Journaled Shares {quantity:g} x {sharesight_code}: Transfer shares to {destination_account} ( {contribution_type} )'
   Qualified Dividend: 'Income: {sharesight_code} qualified dividend'
   Cash Dividend: 'Income: {sharesight_code} cash dividend'
   Special Dividend: 'Income: {sharesight_code} special dividend'

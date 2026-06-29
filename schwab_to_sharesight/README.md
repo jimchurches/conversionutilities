@@ -116,7 +116,35 @@ The bundled `config.yaml` includes mappings derived from your existing Sharesigh
 
 ## Supported Schwab actions
 
-Buy, Sell, dividends, NRA/foreign tax, margin/credit interest, ADR fees, return of capital, and basic option premium rows (STO/BTC/STC/BTO/Expired). Assigned option rows are merged into the matching Buy line.
+Buy, Sell, Journaled Shares (in-specie transfer pairs), dividends, NRA/foreign tax, margin/credit interest, ADR fees, return of capital, and basic option premium rows (STO/BTC/STC/BTO/Expired). Assigned option rows are merged into the matching Buy line.
+
+**Journaled Shares** — Schwab uses signed quantity to distinguish direction (no separate config per account):
+
+| Quantity | Account role | Output |
+|----------|--------------|--------|
+| Positive | Destination (shares in) | Two offsetting entries: contribution deposit + BUY withdrawal |
+| Negative | Source (shares out) | One $0 entry documenting the transfer out |
+
+**Destination** (positive quantity) — two offsetting cash entries (net zero balance):
+
+1. **Deposit** — `Non-Concessional Contribution ({member_name}) (In-Specie Transfer …)`
+2. **Withdrawal** — `BUY … shares (In-Specie Transfer)`
+
+**Source** (negative quantity) — one zero-amount row:
+
+- `Journaled Shares 25 x APPL.NASDAQ: Transfer shares to {destination_account} ( {contribution_type} )`
+
+Configure placeholders in `config.yaml`:
+
+```yaml
+smsf:
+  member_name: Renee Churches              # destination account
+  destination_account: Living Trust        # source account (where shares are going)
+  contribution_type: Voluntary Contribution
+  # aud_exchange_rate: 1.52  # optional; adds (AU$…) to the inbound contribution line
+```
+
+The inbound USD amount is derived from `Quantity` × `Price`. Deposit is written before withdrawal in the CSV so Sharesight's newest-first ledger shows the BUY line above the contribution. Outbound rows leave both amount columns empty ($0).
 
 Corporate actions (mergers, reverse splits, wire fees, etc.) are reported as exceptions for now.
 

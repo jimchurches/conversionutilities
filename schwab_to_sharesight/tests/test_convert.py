@@ -4,9 +4,11 @@ import pandas as pd
 import pytest
 
 from convert import (
+    ConvertedRow,
     build_description,
     convert_file,
     convert_row,
+    derive_row_amount,
     get_security_mapping,
     load_config,
     merge_assigned_buys,
@@ -166,6 +168,60 @@ def test_reorder_same_day_dividend_tax_rows():
     reordered = reorder_same_day_dividend_tax_rows([tax, dividend])
     assert row_action(reordered[0]) == "Qualified Dividend"
     assert row_action(reordered[1]) == "NRA Tax Adj"
+
+
+def test_journaled_shares_inbound(config):
+    row = pd.Series(
+        {
+            "Date": "06/23/2026",
+            "Action": "Journaled Shares",
+            "Symbol": "AAPL",
+            "Description": "APPLE INC",
+            "Quantity": "25",
+            "Price": "$295.91 ",
+            "Amount": "",
+        }
+    )
+
+    assert derive_row_amount(row) == pytest.approx(-7397.75)
+
+    result = convert_row(row, config)
+    assert len(result) == 2
+    deposit_row, withdrawal_row = result
+    assert deposit_row.deposit == "7397.75"
+    assert deposit_row.withdrawal == ""
+    assert (
+        deposit_row.description
+        == "Non-Concessional Contribution (Test Member) (In-Specie Transfer 25 x APPL.NASDAQ)"
+    )
+    assert withdrawal_row.deposit == ""
+    assert withdrawal_row.withdrawal == "7397.75"
+    assert withdrawal_row.description == "BUY 25 APPL.NASDAQ shares (In-Specie Transfer)"
+
+
+def test_journaled_shares_outbound(config):
+    row = pd.Series(
+        {
+            "Date": "06/23/2026",
+            "Action": "Journaled Shares",
+            "Symbol": "AAPL",
+            "Description": "APPLE INC",
+            "Quantity": "-25",
+            "Price": "$295.91 ",
+            "Amount": "",
+        }
+    )
+
+    assert derive_row_amount(row) is None
+
+    result = convert_row(row, config)
+    assert isinstance(result, ConvertedRow)
+    assert result.deposit == ""
+    assert result.withdrawal == ""
+    assert (
+        result.description
+        == "Journaled Shares 25 x APPL.NASDAQ: Transfer shares to Test Super Fund ( Voluntary Contribution )"
+    )
 
 
 def test_merge_assigned_buy(config):

@@ -211,6 +211,133 @@ def row_quantity(row: pd.Series) -> float | None:
     return float(row["Quantity"])
 
 
+def derive_row_amount(row: pd.Series) -> float | None:
+    amount = parse_money(row.get("Amount"), required=False)
+    if amount is not None:
+        return amount
+
+    if row_action(row) == "Journaled Shares":
+        if is_journaled_shares_outbound(row):
+            return None
+        try:
+            return -journaled_shares_value(row)
+        except ValueError:
+            return None
+
+    return None
+
+
+def is_journaled_shares_outbound(row: pd.Series) -> bool:
+    quantity = row_quantity(row)
+    return quantity is not None and quantity < 0
+
+
+def journaled_shares_value(row: pd.Series) -> float:
+    quantity = row_quantity(row)
+    price = parse_money(row.get("Price"), required=False)
+    if quantity is None or price is None:
+        raise ValueError("Journaled Shares row missing quantity or price")
+    return abs(quantity) * price
+
+
+def build_journaled_shares_context(row: pd.Series, config: dict[str, Any]) -> dict[str, Any]:
+    context = build_template_context(row, config)
+    smsf = config.get("smsf", {})
+    context["member_name"] = smsf.get("member_name", "YOUR SMSF MEMBER NAME")
+    context["destination_account"] = smsf.get("destination_account", "YOUR DESTINATION ACCOUNT NAME")
+    context["contribution_type"] = smsf.get("contribution_type", "Voluntary Contribution")
+
+    aud_rate = smsf.get("aud_exchange_rate")
+    if aud_rate:
+        aud_amount = journaled_shares_value(row) * float(aud_rate)
+        context["aud_suffix"] = f" (AU${aud_amount:,.2f})"
+    else:
+        context["aud_suffix"] = ""
+    return context
+
+
+def convert_journaled_shares_outbound_row(row: pd.Series, config: dict[str, Any]) -> ConvertedRow | ExceptionRow:
+    symbol = row_symbol(row)
+    source_description = "" if pd.isna(row.get("Description")) else str(row["Description"]).strip()
+
+    try:
+        parsed_date = parse_schwab_date(row["Date"])
+        context = build_journaled_shares_context(row, config)
+        template = config.get("transaction_templates", {}).get("Journaled Shares Out")
+        if not template:
+            raise KeyError("Unsupported transaction type: Journaled Shares")
+        description = template.format(**context)
+    except KeyError as exc:
+        message = exc.args[0] if exc.args else str(exc)
+        if message == "Missing security mapping in config.yaml":
+            reason = message
+        else:
+            reason = message
+        return ExceptionRow(symbol, source_description, "Journaled Shares", reason)
+    except ValueError as exc:
+        return ExceptionRow(symbol, source_description, "Journaled Shares", str(exc))
+
+    date_format = config.get("output", {}).get("date_format", "d/m/Y")
+    return ConvertedRow(
+        date=format_output_date(parsed_date, date_format),
+        deposit="",
+        withdrawal="",
+        description=description,
+    )
+
+
+def convert_journaled_shares_inbound_rows(row: pd.Series, config: dict[str, Any]) -> list[ConvertedRow] | ExceptionRow:
+    symbol = row_symbol(row)
+    source_description = "" if pd.isna(row.get("Description")) else str(row["Description"]).strip()
+
+    try:
+        parsed_date = parse_schwab_date(row["Date"])
+        value = journaled_shares_value(row)
+        context = build_journaled_shares_context(row, config)
+        templates = config.get("transaction_templates", {})
+        deposit_template = templates.get("Journaled Shares Deposit")
+        withdrawal_template = templates.get("Journaled Shares Withdrawal")
+        if not deposit_template or not withdrawal_template:
+            raise KeyError("Unsupported transaction type: Journaled Shares")
+        deposit_description = deposit_template.format(**context)
+        withdrawal_description = withdrawal_template.format(**context)
+    except KeyError as exc:
+        message = exc.args[0] if exc.args else str(exc)
+        if message == "Missing security mapping in config.yaml":
+            reason = message
+        else:
+            reason = message
+        return ExceptionRow(symbol, source_description, "Journaled Shares", reason)
+    except ValueError as exc:
+        return ExceptionRow(symbol, source_description, "Journaled Shares", str(exc))
+
+    date_format = config.get("output", {}).get("date_format", "d/m/Y")
+    formatted_date = format_output_date(parsed_date, date_format)
+    amount = format_output_amount(value, config)
+    return [
+        ConvertedRow(
+            date=formatted_date,
+            deposit=amount,
+            withdrawal="",
+            description=deposit_description,
+        ),
+        ConvertedRow(
+            date=formatted_date,
+            deposit="",
+            withdrawal=amount,
+            description=withdrawal_description,
+        ),
+    ]
+
+
+def convert_journaled_shares_rows(
+    row: pd.Series, config: dict[str, Any]
+) -> ConvertedRow | list[ConvertedRow] | ExceptionRow:
+    if is_journaled_shares_outbound(row):
+        return convert_journaled_shares_outbound_row(row, config)
+    return convert_journaled_shares_inbound_rows(row, config)
+
+
 def parse_option_contract(symbol: str) -> OptionContract:
     match = OPTION_SYMBOL_RE.match(symbol.strip())
     if not match:
@@ -427,14 +554,17 @@ def reorder_same_day_dividend_tax_rows(rows: list[pd.Series]) -> list[pd.Series]
     return result
 
 
-def convert_row(row: pd.Series, config: dict[str, Any]) -> ConvertedRow | ExceptionRow:
+def convert_row(row: pd.Series, config: dict[str, Any]) -> ConvertedRow | list[ConvertedRow] | ExceptionRow:
     symbol = row_symbol(row)
     source_description = "" if pd.isna(row.get("Description")) else str(row["Description"]).strip()
     action = row_action(row)
 
+    if action == "Journaled Shares":
+        return convert_journaled_shares_rows(row, config)
+
     try:
         parsed_date = parse_schwab_date(row["Date"])
-        amount = parse_money(row.get("Amount"), required=False)
+        amount = derive_row_amount(row)
         description = build_description(row, config)
     except KeyError as exc:
         message = exc.args[0] if exc.args else str(exc)
@@ -479,7 +609,9 @@ def convert_file(
         if action == "Assigned":
             continue
         result = convert_row(row, config)
-        if isinstance(result, ConvertedRow):
+        if isinstance(result, list):
+            converted_rows.extend(result)
+        elif isinstance(result, ConvertedRow):
             converted_rows.append(result)
         else:
             exception_rows.append(result)
