@@ -1,0 +1,123 @@
+smsf:
+  member_name: YOUR SMSF MEMBER NAME
+  employer_name: YOUR EMPLOYER NAME
+
+securities:
+  MQG:
+    sharesight_code: MQG.ASX
+    name: Macquarie Group
+    patterns: ["MQG"]
+  RESMED:
+    sharesight_code: RMD.ASX
+    name: ResMed
+    patterns: ["RESMED"]
+  WTC:
+    sharesight_code: WTC.ASX
+    name: WiseTech Global
+    patterns: [" WTC "]
+  HUB:
+    sharesight_code: HUB.ASX
+    name: Hub24
+    patterns: [" HUB "]
+  HUB24:
+    sharesight_code: HUB.ASX
+    name: Hub24
+    patterns: ["HUB24"]
+  SGL:
+    sharesight_code: SIG.ASX
+    name: Sigma Healthcare
+    patterns: [" SGL "]
+  NWL:
+    sharesight_code: NWL.ASX
+    name: Netwealth Group
+    patterns: [" NWL ", "NETWEALTH GROUP"]
+  PME:
+    sharesight_code: PME.ASX
+    name: Premier Investments
+    patterns: [" PME "]
+  CSL:
+    sharesight_code: CSL.ASX
+    name: CSL
+    patterns: ["CSL LTD"]
+  CTD:
+    sharesight_code: CTD.ASX
+    name: Corporate Travel Management
+    patterns: [" CTD "]
+  PWR:
+    sharesight_code: PWH.ASX
+    name: PWR Holdings
+    patterns: ["PWR HOLDING"]
+  BAP:
+    sharesight_code: BAP.ASX
+    name: Bapcor
+    patterns: [" BAP "]
+  GMG:
+    sharesight_code: GMG.ASX
+    name: Goodman Group
+    patterns: ["GOODMAN GROUP"]
+  REA:
+    sharesight_code: REA.ASX
+    name: REA Group
+    patterns: [" REA "]
+  PNI:
+    sharesight_code: PNI.ASX
+    name: Pinnacle Investment Management
+    patterns: ["PINNACLE INVEST"]
+  IEL:
+    sharesight_code: IEL.ASX
+    name: IDP Education
+    patterns: [" IEL "]
+  FLT:
+    sharesight_code: FLT.ASX
+    name: Flight Centre Travel Group
+    patterns: ["FLT CENTRE"]
+  BTH:
+    sharesight_code: BTH.ASX
+    name: Bathurst Resources
+    patterns: [" BTH "]
+
+description_rules:
+  - match: "^Direct Debit .* COMMSEC SECURITI COMMSEC$"
+    template: "Transfer to CommSec"
+  - match: "^Direct Credit .* COMMONWEALTH SEC COMMSEC$"
+    template: "Transfer from CommSec"
+  - match: "^ASIC NetBank BPAY"
+    template: "ASIC fee"
+  - match: "^TAX OFFICE PAYMENTS"
+    template: "PAYG tax payment"
+  - match: "^Direct Debit .* IGNITIONPAY"
+    template: "Accounting fees"
+  - match: "^Transfer To National Audits Group"
+    template: "SMSF audit fee"
+  - match: "^Transfer To Charles Schwab Co"
+    template: "Transfer to Charles Schwab"
+  - match: "^Transfer To SUPERCentral"
+    template: "Transfer to SUPERCentral"
+  - match: "^DEPOSIT CASH"
+    template: "Cash deposit"
+  - match: "^Direct Credit .* SuperChoice"
+    template: "Employer super contribution ({employer_name})"
+  - match: "^Direct Credit .* ClickSuper"
+    template: "Employer super contribution ({employer_name})"
+  - match: "^Direct Credit .* QUICKSUPER"
+    template: "Employer super contribution ({employer_name})"
+  - match: "^Direct Credit .* PUSHPAY HOLDINGS"
+    template: "Income: PPH.ASX dividend"
+
+transaction_templates:
+  Credit Interest: "Income: Interest payment"
+  Dividend: "Income: {sharesight_code} dividend"
+  Interim Dividend: "Income: {sharesight_code} interim dividend"
+  Final Dividend: "Income: {sharesight_code} final dividend"
+  Scheme Payment: "Income: {sharesight_code} scheme payment"
+  Hub24 Distribution: "Income: {sharesight_code} distribution"
+  ATO Refund: "ATO refund"
+
+output:
+  date_format: d/m/Y
+  include_currency_symbol: false
+  columns:
+    - Date
+    - Deposit amount
+    - Withdrawal amount
+    - Description

@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.DS_Store
+
+# Generated conversion output (may contain personal transaction data)
+output/*.csv
+!output/.gitkeep
+
+# Real CommBank exports — keep local only
+input/*.csv
+!input/sample_commbank.csv
+commbank-output.csv
+CSVData*.csv
+
+# Local-only folder for working copies of real CommBank exports
+local/*
+!local/.gitkeep

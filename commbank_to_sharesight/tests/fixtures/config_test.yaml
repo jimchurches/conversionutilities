@@ -1,0 +1,42 @@
+smsf:
+  member_name: Test Member
+  employer_name: Test Employer
+
+securities:
+  MQG:
+    sharesight_code: MQG.ASX
+    patterns: ["MQG"]
+  HUB24:
+    sharesight_code: HUB.ASX
+    patterns: ["HUB24"]
+  GMG:
+    sharesight_code: GMG.ASX
+    patterns: ["GOODMAN GROUP"]
+
+description_rules:
+  - match: "^Direct Debit .* COMMSEC SECURITI COMMSEC$"
+    template: "Transfer to CommSec"
+  - match: "^Direct Credit .* COMMONWEALTH SEC COMMSEC$"
+    template: "Transfer from CommSec"
+  - match: "^ASIC NetBank BPAY"
+    template: "ASIC fee"
+  - match: "^Direct Credit .* SuperChoice"
+    template: "Employer super contribution ({employer_name})"
+
+transaction_templates:
+  Credit Interest: "Income: Interest payment"
+  Dividend: "Income: {sharesight_code} dividend"
+  Interim Dividend: "Income: {sharesight_code} interim dividend"
+  Final Dividend: "Income: {sharesight_code} final dividend"
+  Scheme Payment: "Income: {sharesight_code} scheme payment"
+  Hub24 Distribution: "Income: {sharesight_code} distribution"
+  ATO Refund: "ATO refund"
+
+output:
+  date_format: d/m/Y
+  include_currency_symbol: false
+  columns:
+    - Date
+    - Deposit amount
+    - Withdrawal amount
+    - Description
