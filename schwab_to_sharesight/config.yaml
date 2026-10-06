@@ -568,7 +568,7 @@ securities:
     sharesight_code: ZUO.NYSE
     unit_label: shares
 transaction_templates:
-  Sell: SELL {quantity:g} x {sharesight_code} {unit_label}
+  Sell: SELL {quantity:g} x {sharesight_code} {unit_label}{assignment_note}
   Buy: BUY {quantity:g} x {sharesight_code} {unit_label}{assignment_note}
   Journaled Shares Deposit: 'Non-Concessional Contribution ({member_name}) (In-Specie Transfer {quantity:g} x {sharesight_code}){aud_suffix}'
   Journaled Shares Withdrawal: BUY {quantity:g} {sharesight_code} {unit_label} (In-Specie Transfer)
@@ -591,11 +591,17 @@ transaction_templates:
   Sell to Close: 'Options Premium: STC {quantity:g} x {option_contract}'
   Buy to Open: 'Options Premium: BTO {quantity:g} x {option_contract}'
   Expired: 'Options Expired: {quantity:g} x {option_contract_mapped} ( {position} )'
+  Assigned: 'Assigned {quantity:g} x {option_contract_mapped} ({position})'
+  Wire Sent: Wire Transfer ([Destination])
+  Wire Fee: Wire Fee
+  Wire Fee Refund: Wire Fee Refund
 stock_splits:
   NOW:
     ratio: "1:5"
   NFLX:
     ratio: "1:10"
+  MNST:
+    ratio: "1:2"
 output:
   date_format: d/m/Y
   include_currency_symbol: false

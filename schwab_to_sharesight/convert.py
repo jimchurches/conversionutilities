@@ -396,7 +396,7 @@ def build_template_context(row: pd.Series, config: dict[str, Any]) -> dict[str, 
         context["unit_label"] = mapping.get("unit_label", default_unit_label(config))
         context["name"] = mapping.get("name", "")
 
-    if action in {"Sell to Open", "Buy to Close", "Sell to Close", "Buy to Open", "Expired"}:
+    if action in {"Sell to Open", "Buy to Close", "Sell to Close", "Buy to Open", "Expired", "Assigned"}:
         contract = parse_option_contract(symbol)
         mapped_code = None
         if stock_symbol:
@@ -447,6 +447,26 @@ def build_stock_split_description(row: pd.Series, config: dict[str, Any]) -> str
     return f"Stock split: {code}"
 
 
+def resolve_transaction_template(row: pd.Series, config: dict[str, Any]) -> str:
+    action = row_action(row)
+    templates = config.get("transaction_templates", {})
+    source_desc = "" if pd.isna(row.get("Description")) else str(row["Description"]).strip().upper()
+
+    if action == "Service Fee" and "WIRED FUNDS FEE" in source_desc:
+        template = templates.get("Wire Fee")
+        if template:
+            return template
+    if action == "Misc Cash Entry" and "WAIVE WIRE FEE" in source_desc:
+        template = templates.get("Wire Fee Refund")
+        if template:
+            return template
+
+    template = templates.get(action)
+    if not template:
+        raise KeyError(f"Unsupported transaction type: {action}")
+    return template
+
+
 def build_description(row: pd.Series, config: dict[str, Any]) -> str:
     action = row_action(row)
     if action == "Adjustment":
@@ -454,52 +474,78 @@ def build_description(row: pd.Series, config: dict[str, Any]) -> str:
     if action == "Stock Split":
         return build_stock_split_description(row, config)
 
-    templates = config.get("transaction_templates", {})
-    template = templates.get(action)
-    if not template:
-        raise KeyError(f"Unsupported transaction type: {action}")
+    template = resolve_transaction_template(row, config)
 
     context = build_template_context(row, config)
     return template.format(**context)
 
 
+def assignment_stock_action(contract: OptionContract, quantity: float | None) -> str:
+    """Share trade Schwab records when an option is assigned.
+
+    Short call and long put assignments sell shares. Short put and long call
+    assignments buy shares. Schwab uses a positive option quantity for short.
+    """
+    is_long = quantity is not None and quantity < 0
+    is_call = contract.right.upper() == "C"
+    if is_call:
+        return "Buy" if is_long else "Sell"
+    return "Sell" if is_long else "Buy"
+
+
+def assignment_note(row: pd.Series, config: dict[str, Any]) -> str:
+    template = config.get("transaction_templates", {}).get("Assigned")
+    contract = parse_option_contract(row_symbol(row))
+    quantity = row_quantity(row)
+    try:
+        if not template:
+            raise KeyError("Unsupported transaction type: Assigned")
+        context = build_template_context(row, config)
+        description = template.format(**context)
+    except KeyError:
+        position = "LONG" if quantity is not None and quantity < 0 else "SHORT"
+        assignment_qty = abs(quantity or 1)
+        description = f"Assigned {assignment_qty:g} x {contract.format_contract(contract.underlying)} ({position})"
+    return f" --> {description}"
+
+
 def merge_assigned_buys(rows: list[pd.Series], config: dict[str, Any]) -> list[pd.Series]:
-    merged: list[pd.Series] = []
-    pending_buys: dict[tuple[str, str], pd.Series] = {}
+    """Fold an Assigned option into the same-day share buy or sell."""
+    prepared: list[pd.Series] = []
+    stock_rows: dict[tuple[str, str, str], list[pd.Series]] = {}
 
     for row in rows:
         if not is_valid_row(row):
             continue
-        action = row_action(row)
+        prepared_row = row.copy()
+        prepared.append(prepared_row)
+        action = row_action(prepared_row)
+        if action not in {"Buy", "Sell"}:
+            continue
+        prepared_row["_assignment_note"] = ""
+        key = (
+            parse_schwab_date(prepared_row["Date"]).date().isoformat(),
+            underlying_symbol(row_symbol(prepared_row)),
+            action,
+        )
+        stock_rows.setdefault(key, []).append(prepared_row)
+
+    merged: list[pd.Series] = []
+    for row in prepared:
+        if row_action(row) != "Assigned":
+            merged.append(row)
+            continue
+
+        contract = parse_option_contract(row_symbol(row))
         date_key = parse_schwab_date(row["Date"]).date().isoformat()
-
-        if action == "Buy":
-            key = (date_key, underlying_symbol(row_symbol(row)))
-            buy_row = row.copy()
-            buy_row["_assignment_note"] = ""
-            pending_buys[key] = buy_row
-            merged.append(buy_row)
+        stock_action = assignment_stock_action(contract, row_quantity(row))
+        candidates = stock_rows.get((date_key, contract.underlying, stock_action), [])
+        stock_row = next((candidate for candidate in candidates if not candidate.get("_assignment_note")), None)
+        if stock_row is None:
+            merged.append(row)
             continue
 
-        if action == "Assigned":
-            contract = parse_option_contract(row_symbol(row))
-            key = (date_key, contract.underlying)
-            buy_row = pending_buys.get(key)
-            if buy_row is None:
-                merged.append(row)
-                continue
-
-            try:
-                code = get_security_mapping(contract.underlying, config)["sharesight_code"]
-            except KeyError:
-                code = contract.underlying
-            assignment_qty = abs(row_quantity(row) or 1)
-            buy_row["_assignment_note"] = (
-                f" --> Assigned: {assignment_qty:g} x {contract.format_contract(code)}"
-            )
-            continue
-
-        merged.append(row)
+        stock_row["_assignment_note"] = assignment_note(row, config)
 
     return merged
 
@@ -605,9 +651,6 @@ def convert_file(
     exception_rows: list[ExceptionRow] = []
 
     for row in source_rows:
-        action = row_action(row)
-        if action == "Assigned":
-            continue
         result = convert_row(row, config)
         if isinstance(result, list):
             converted_rows.extend(result)

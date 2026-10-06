@@ -106,7 +106,7 @@ securities:
     unit_label: units
 
 transaction_templates:
-  Sell: "SELL {quantity:g} x {sharesight_code} {unit_label}"
+  Sell: "SELL {quantity:g} x {sharesight_code} {unit_label}{assignment_note}"
   Buy: "BUY {quantity:g} x {sharesight_code} {unit_label}{assignment_note}"
   Qualified Dividend: "Income: {sharesight_code} qualified dividend"
   NRA Tax Adj: "Foreign Tax (United States NRA Withholding)"
@@ -116,7 +116,7 @@ The bundled `config.yaml` includes mappings derived from your existing Sharesigh
 
 ## Supported Schwab actions
 
-Buy, Sell, Journaled Shares (in-specie transfer pairs), dividends, NRA/foreign tax, margin/credit interest, ADR fees, return of capital, and basic option premium rows (STO/BTC/STC/BTO/Expired). Assigned option rows are merged into the matching Buy line.
+Buy, Sell, Journaled Shares (in-specie transfer pairs), dividends, NRA/foreign tax, margin/credit interest, ADR fees, return of capital, wire transfers (with fee and waiver), and basic option premium rows (STO/BTC/STC/BTO/Expired/Assigned). An Assigned row is merged into the same-day share trade: short calls and long puts onto the Sell, short puts and long calls onto the Buy. The line looks like `SELL 100 x NVDA.NASDAQ shares --> Assigned 1 x NVDA.NASDAQ 30/SEP/2026 227.50 CALL (SHORT)`. If that share trade is already in Sharesight, the assignment stays as its own $0 line.
 
 **Journaled Shares** — Schwab uses signed quantity to distinguish direction (no separate config per account):
 
@@ -146,7 +146,17 @@ smsf:
 
 The inbound USD amount is derived from `Quantity` × `Price`. Deposit is written before withdrawal in the CSV so Sharesight's newest-first ledger shows the BUY line above the contribution. Outbound rows leave both amount columns empty ($0).
 
-Corporate actions (mergers, reverse splits, wire fees, etc.) are reported as exceptions for now.
+Corporate actions (mergers, reverse splits, etc.) are reported as exceptions for now.
+
+**Wire transfers** — Schwab exports three lines per wire (disbursement, fee, fee waiver). These map to:
+
+| Schwab action | Description | Sharesight description |
+|---------------|-------------|------------------------|
+| Wire Sent | WIRED FUNDS DISBURSED | `Wire Transfer ([Destination])` |
+| Service Fee | WIRED FUNDS FEE | `Wire Fee` |
+| Misc Cash Entry | WAIVE WIRE FEE | `Wire Fee Refund` |
+
+Replace `[Destination]` in Sharesight after import (e.g. `ANZ Offset Account`). Other `Service Fee` / `Misc Cash Entry` rows remain exceptions until a template is added.
 
 Stock splits use ratios from `stock_splits` in config:
 
@@ -156,6 +166,8 @@ stock_splits:
     ratio: "1:5"
   NFLX:
     ratio: "1:10"
+  MNST:
+    ratio: "1:2"
 ```
 
 Withholding corrections (`Adjustment` rows) map to your `Adjustment: NRA withholding` / `Adjustment: Reverse NRA withholding` notation.

@@ -256,8 +256,145 @@ def test_merge_assigned_buy(config):
     merged = merge_assigned_buys([buy, assigned], config_with_intc)
     result = convert_row(merged[0], config_with_intc)
 
-    assert "BUY 100 x INTC.NASDAQ shares --> Assigned: 1 x INTC.NASDAQ 17/JAN/2025 45.00 PUT" == result.description
+    assert "BUY 100 x INTC.NASDAQ shares --> Assigned 1 x INTC.NASDAQ 17/JAN/2025 45.00 PUT (SHORT)" == result.description
     assert result.withdrawal == "4500.00"
+    assert len(merged) == 1
+
+
+def test_assigned_short_call_merges_into_later_sell(config):
+    assigned = pd.Series(
+        {
+            "Date": "10/01/2026 as of 09/30/2026",
+            "Action": "Assigned",
+            "Symbol": "NVDA 09/30/2026 227.50 C",
+            "Description": "CALL NVIDIA CORP $227.5 EXP 09/30/26",
+            "Quantity": "1",
+            "Amount": "",
+        }
+    )
+    sell = pd.Series(
+        {
+            "Date": "10/01/2026 as of 09/30/2026",
+            "Action": "Sell",
+            "Symbol": "NVDA",
+            "Description": "NVIDIA CORP",
+            "Quantity": "100",
+            "Amount": "$22749.53",
+        }
+    )
+    config_with_nvda = {
+        **config,
+        "securities": {
+            **config["securities"],
+            "NVDA": {"sharesight_code": "NVDA.NASDAQ", "unit_label": "shares"},
+        },
+    }
+    merged = merge_assigned_buys([assigned, sell], config_with_nvda)
+    assert len(merged) == 1
+    result = convert_row(merged[0], config_with_nvda)
+    assert (
+        result.description
+        == "SELL 100 x NVDA.NASDAQ shares --> Assigned 1 x NVDA.NASDAQ 30/SEP/2026 227.50 CALL (SHORT)"
+    )
+    assert result.deposit == "22749.53"
+
+
+def test_assigned_long_call_merges_into_buy(config):
+    buy = pd.Series(
+        {
+            "Date": "10/01/2026",
+            "Action": "Buy",
+            "Symbol": "NVDA",
+            "Description": "NVIDIA CORP",
+            "Quantity": "100",
+            "Amount": "-$22750.00",
+        }
+    )
+    assigned = pd.Series(
+        {
+            "Date": "10/01/2026",
+            "Action": "Assigned",
+            "Symbol": "NVDA 09/30/2026 227.50 C",
+            "Description": "CALL NVIDIA CORP $227.5 EXP 09/30/26",
+            "Quantity": "-1",
+            "Amount": "",
+        }
+    )
+    config_with_nvda = {
+        **config,
+        "securities": {
+            **config["securities"],
+            "NVDA": {"sharesight_code": "NVDA.NASDAQ", "unit_label": "shares"},
+        },
+    }
+    merged = merge_assigned_buys([assigned, buy], config_with_nvda)
+    result = convert_row(merged[0], config_with_nvda)
+    assert (
+        result.description
+        == "BUY 100 x NVDA.NASDAQ shares --> Assigned 1 x NVDA.NASDAQ 30/SEP/2026 227.50 CALL (LONG)"
+    )
+
+
+def test_assigned_long_put_merges_into_sell(config):
+    sell = pd.Series(
+        {
+            "Date": "10/01/2026",
+            "Action": "Sell",
+            "Symbol": "NVDA",
+            "Description": "NVIDIA CORP",
+            "Quantity": "100",
+            "Amount": "$22750.00",
+        }
+    )
+    assigned = pd.Series(
+        {
+            "Date": "10/01/2026",
+            "Action": "Assigned",
+            "Symbol": "NVDA 09/30/2026 227.50 P",
+            "Description": "PUT NVIDIA CORP $227.5 EXP 09/30/26",
+            "Quantity": "-1",
+            "Amount": "",
+        }
+    )
+    config_with_nvda = {
+        **config,
+        "securities": {
+            **config["securities"],
+            "NVDA": {"sharesight_code": "NVDA.NASDAQ", "unit_label": "shares"},
+        },
+    }
+    merged = merge_assigned_buys([sell, assigned], config_with_nvda)
+    result = convert_row(merged[0], config_with_nvda)
+    assert (
+        result.description
+        == "SELL 100 x NVDA.NASDAQ shares --> Assigned 1 x NVDA.NASDAQ 30/SEP/2026 227.50 PUT (LONG)"
+    )
+
+
+def test_unmatched_assigned_row(config):
+    assigned = pd.Series(
+        {
+            "Date": "07/24/2026 as of 07/23/2026",
+            "Action": "Assigned",
+            "Symbol": "DDOG 07/24/2026 265.00 P",
+            "Description": "PUT DATADOG INC $265 EXP 07/24/26",
+            "Quantity": "1",
+            "Amount": "",
+        }
+    )
+    config_with_ddog = {
+        **config,
+        "securities": {
+            **config["securities"],
+            "DDOG": {"sharesight_code": "DDOG.NASDAQ", "unit_label": "shares"},
+        },
+    }
+    result = convert_row(assigned, config_with_ddog)
+    assert isinstance(result, ConvertedRow)
+    assert result.date == "24/7/2026"
+    assert result.deposit == ""
+    assert result.withdrawal == ""
+    assert result.description == "Assigned 1 x DDOG.NASDAQ 24/JUL/2026 265.00 PUT (SHORT)"
 
 
 def test_full_csv_conversion(config, tmp_path):
@@ -298,20 +435,76 @@ def test_missing_ticker_mapping(config):
     assert result.reason == "Missing security mapping in config.yaml"
 
 
-def test_unsupported_transaction_type(config):
-    row = pd.Series(
-        {
-            "Date": "05/27/2026",
-            "Action": "Wire Sent",
-            "Symbol": "",
-            "Description": "FX WIRE OUT",
-            "Quantity": "",
-            "Amount": "-$100.00",
-        }
+def test_wire_transfer_rows(config):
+    wire = convert_row(
+        pd.Series(
+            {
+                "Date": "07/29/2026",
+                "Action": "Wire Sent",
+                "Symbol": "",
+                "Description": "WIRED FUNDS DISBURSED",
+                "Quantity": "",
+                "Amount": "-$1900.00",
+            }
+        ),
+        config,
     )
-    result = convert_row(row, config)
-    assert result.transaction_type == "Wire Sent"
-    assert result.reason == "Unsupported transaction type: Wire Sent"
+    assert isinstance(wire, ConvertedRow)
+    assert wire.description == "Wire Transfer ([Destination])"
+    assert wire.withdrawal == "1900.00"
+    assert wire.deposit == ""
+
+    fee = convert_row(
+        pd.Series(
+            {
+                "Date": "07/29/2026",
+                "Action": "Service Fee",
+                "Symbol": "",
+                "Description": "WIRED FUNDS FEE",
+                "Quantity": "",
+                "Amount": "-$15.00",
+            }
+        ),
+        config,
+    )
+    assert isinstance(fee, ConvertedRow)
+    assert fee.description == "Wire Fee"
+    assert fee.withdrawal == "15.00"
+
+    refund = convert_row(
+        pd.Series(
+            {
+                "Date": "07/29/2026",
+                "Action": "Misc Cash Entry",
+                "Symbol": "",
+                "Description": "WAIVE WIRE FEE",
+                "Quantity": "",
+                "Amount": "$15.00",
+            }
+        ),
+        config,
+    )
+    assert isinstance(refund, ConvertedRow)
+    assert refund.description == "Wire Fee Refund"
+    assert refund.deposit == "15.00"
+
+
+def test_unsupported_service_fee(config):
+    result = convert_row(
+        pd.Series(
+            {
+                "Date": "05/27/2026",
+                "Action": "Service Fee",
+                "Symbol": "",
+                "Description": "OTHER SERVICE FEE",
+                "Quantity": "",
+                "Amount": "-$10.00",
+            }
+        ),
+        config,
+    )
+    assert result.transaction_type == "Service Fee"
+    assert result.reason == "Unsupported transaction type: Service Fee"
 
 
 def test_conversion_stops_on_exceptions(config, tmp_path):
